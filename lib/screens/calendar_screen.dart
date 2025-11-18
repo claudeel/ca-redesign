@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 import '../constants/colors.dart';
 import '../widgets/calendar_header.dart';
 import '../widgets/liturgical_bottom_sheet.dart';
@@ -13,14 +14,14 @@ class CalendarScreen extends StatefulWidget {
 }
 
 class _CalendarScreenState extends State<CalendarScreen> {
-  DateTime _focusedDay = DateTime.now();  // Use current date for initial focus
+  DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<int, Map<String, dynamic>> _liturgicalData = {};  // Initialize to empty to avoid late error
+  Map<int, Map<String, dynamic>> _liturgicalData = {};
 
   @override
   void initState() {
     super.initState();
-    _loadLiturgicalData();  // Load data in initState
+    _loadLiturgicalData();
   }
 
   void _loadLiturgicalData() {
@@ -71,14 +72,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     final bool showBottomSheet = _selectedDay != null;
     final String monthName = DateFormat('MMMM yyyy').format(_focusedDay);
-    // Filter feasts (exclude plain 'Weekday')
     final List<MapEntry<int, Map<String, dynamic>>> feasts = _liturgicalData.entries
         .where((entry) => entry.value['description'] != 'Weekday')
         .toList();
 
     return Stack(
       children: [
-        // Main content with calendar and feast list
         SingleChildScrollView(
           child: Column(
             children: [
@@ -87,13 +86,13 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 onPrevious: () {
                   setState(() {
                     _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
-                    _loadLiturgicalData();  // Reload for new month
+                    _loadLiturgicalData();
                   });
                 },
                 onNext: () {
                   setState(() {
                     _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
-                    _loadLiturgicalData();  // Reload for new month
+                    _loadLiturgicalData();
                   });
                 },
               ),
@@ -108,46 +107,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     _focusedDay = focusedDay;
                   });
                 },
-                onPageChanged: (focusedDay) {
-                  setState(() {
-                    _focusedDay = focusedDay;
-                    _loadLiturgicalData();  // Reload when page changes
-                  });
-                },
-                eventLoader: _getEventsForDay,
-                calendarBuilders: CalendarBuilders(
-                  markerBuilder: (context, day, events) {
-                    if (events.isEmpty) return null;
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: events.map((color) => Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 2.0),
-                        child: Container(
-                          width: 6.0,
-                          height: 6.0,
-                          decoration: BoxDecoration(
-                            color: color as Color,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      )).toList(),
-                    );
-                  },
-                  selectedBuilder: (context, day, focusedDay) {
-                    return Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        shape: BoxShape.circle,
-                      ),
-                      margin: const EdgeInsets.all(4.0),
-                      alignment: Alignment.center,
-                      child: Text(
-                        '${day.day}',
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                    );
-                  },
-                ),
+                // ...
               ),
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -168,12 +128,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         final day = entry.key;
                         final data = entry.value;
                         return ListTile(
-                          title: Text('August $day: ${data['description']}'),  // Update 'August' to dynamic if needed
+                          title: Text('August $day: ${data['description']}'),
                           subtitle: Text('Gospel: ${data['gospel']}'),
                           onTap: () {
-                            setState(() {
-                              _selectedDay = DateTime(_focusedDay.year, _focusedDay.month, day);
-                            });
+                            final selectedDate = DateTime(_focusedDay.year, _focusedDay.month, day);
+                            context.push('/calendar/readings?date=${selectedDate.toIso8601String()}');
                           },
                         );
                       },
@@ -184,18 +143,15 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ],
           ),
         ),
-        // Conditional overlay and bottom sheet
         if (showBottomSheet) ...[
-          // Overlay (tappable to close)
           Positioned.fill(
             child: GestureDetector(
               onTap: _closeBottomSheet,
               child: Container(
-                color: Colors.black.withOpacity(0.3), // bg-black/30
+                color: Colors.black.withOpacity(0.3),
               ),
             ),
           ),
-          // Bottom sheet content
           Positioned(
             bottom: 0,
             left: 0,
@@ -206,12 +162,11 @@ class _CalendarScreenState extends State<CalendarScreen> {
             ),
           ),
         ],
-        // Floating Action Button (always visible)
         Positioned(
-          bottom: 24.0, // bottom-6
-          right: 24.0, // right-6
+          bottom: 24.0,
+          right: 24.0,
           child: FloatingActionButton(
-            onPressed: () {}, // TODO: Implement add action
+            onPressed: () {},
             backgroundColor: AppColors.primary,
             child: const Icon(Icons.add, size: 32.0, color: Colors.white),
           ),
@@ -220,7 +175,6 @@ class _CalendarScreenState extends State<CalendarScreen> {
     );
   }
 
-  // Event loader: Returns list of colors for each day (liturgical markers)
   List<Color> _getEventsForDay(DateTime day) {
     if (day.year == _focusedDay.year && day.month == _focusedDay.month) {
       final data = _liturgicalData[day.day];

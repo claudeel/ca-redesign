@@ -1,43 +1,58 @@
 import 'package:flutter/material.dart';
-import '../widgets/app_header.dart';
-import '../widgets/daily_reading_card.dart';
-import '../widgets/discover_section.dart';
-import '../widgets/bottom_nav.dart';
+import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
+import '../widgets/home_header.dart';
+import '../widgets/mass_readings_card.dart';
+import '../widgets/daily_reflection_card.dart';
+import '../widgets/saint_prayer_grid.dart';
+import '../widgets/featured_teaching_card.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
+    final today = DateTime.now();
+    final formattedDate = DateFormat('EEEE, MMMM d').format(today);
+    final liturgicalDate = 'Twenty-seventh Sunday in Ordinary Time'; // TODO: Make dynamic
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(bottom: 112.0), // Space for bottom nav + padding
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Main content
-          SingleChildScrollView(
+          const HomeHeader(),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const AppHeader(),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16.0, 20.0, 16.0, 8.0),
-                  child: Text(
-                    'Tuesday, 20th Week in Ordinary Time',
-                    style: Theme.of(context).textTheme.headlineMedium,
+                Text(
+                  formattedDate,
+                  style: const TextStyle(
+                    fontSize: 32.0,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const DailyReadingCard(),
-                const DiscoverSection(),
-                const SizedBox(height: 80.0), // Space for bottom nav
+                const SizedBox(height: 4.0),
+                Text(
+                  liturgicalDate,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: Colors.black.withOpacity(0.7),
+                  ),
+                ),
               ],
             ),
           ),
-          // Bottom navigation (fixed)
-          const Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: BottomNav(),
-          ),
+          const SizedBox(height: 24.0),
+          const MassReadingsCard(),
+          const SizedBox(height: 24.0),
+          const DailyReflectionCard(),
+          const SizedBox(height: 12.0),
+          const SaintPrayerGrid(),
+          const SizedBox(height: 12.0),
+          const FeaturedTeachingCard(),
         ],
       ),
     );

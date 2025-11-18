@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DailyReadingCard extends StatelessWidget {
   const DailyReadingCard({super.key});
@@ -8,7 +9,8 @@ class DailyReadingCard extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.0)),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12.0)),
         elevation: 4.0,
         child: Column(
           children: [
@@ -24,42 +26,34 @@ class DailyReadingCard extends StatelessWidget {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Today's Reading",
-                    style: Theme.of(context).textTheme.labelMedium,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    "Tap to read the full text for today's mass and reflect.",
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .bodyMedium,
                   ),
-                  const SizedBox(height: 4.0),
-                  Text(
-                    'Gospel: Matthew 19:23-30',
-                    style: Theme.of(context).textTheme.titleMedium,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    final today = DateTime.now();
+                    context.push(
+                        '/calendar/readings?date=${today.toIso8601String()}');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Theme
+                        .of(context)
+                        .primaryColor,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0)),
                   ),
-                  const SizedBox(height: 16.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          "Tap to read the full text for today's mass and reflect.",
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {}, // TODO: Navigate to reading
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Theme.of(context).primaryColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
-                        ),
-                        child: const Text('Read Now'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                  child: const Text('Read Now'),
+                ),
+              ],
             ),
           ],
         ),

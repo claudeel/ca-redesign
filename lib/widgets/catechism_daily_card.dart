@@ -19,8 +19,7 @@ class CatechismDailyCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Expanded(
-                  child: Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -60,7 +59,6 @@ class CatechismDailyCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
               ],
             ),
           ),
